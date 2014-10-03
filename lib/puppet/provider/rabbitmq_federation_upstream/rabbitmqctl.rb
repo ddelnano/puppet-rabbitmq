@@ -48,7 +48,7 @@ Puppet::Type.type(:rabbitmq_federation_upstream).provide(:rabbitmqctl) do
   end
 
   def destroy
-    rabbitmqctl('clear_parameter', '-p', resource[:vhost], 'federation-upstream', resource[:name])
+    rabbitmqctl('clear_parameter', '-p', @property_hash[:vhost], 'federation-upstream', resource[:name])
     @property_hash = {}  # used in conjunction with flush to avoid calling non-indempotent destroy twice
   end
 

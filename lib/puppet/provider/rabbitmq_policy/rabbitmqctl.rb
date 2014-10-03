@@ -51,7 +51,7 @@ Puppet::Type.type(:rabbitmq_policy).provide(:rabbitmqctl) do
   end
 
   def destroy
-    rabbitmqctl('clear_policy', '-p', resource[:vhost], resource[:name])
+    rabbitmqctl('clear_policy', '-p', @property_hash[:vhost], resource[:name])
     @property_hash = {}  # used in conjunction with flush to avoid calling non-indempotent destroy twice
   end
 

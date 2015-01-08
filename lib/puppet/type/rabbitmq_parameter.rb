@@ -49,15 +49,23 @@ Puppet::Type.newtype(:rabbitmq_parameter) do
         raise ArgumentError, 'value must be a non-empty Hash'
       end
     end
-    munge do |value|
-      newval = {}
-      value.each do |k,v|
-        if v =~ /^\d+$/
-          v = v.to_i
+    def fixnumify obj
+      if obj.respond_to? :to_i
+        if "#{obj.to_i}" == obj
+          obj.to_i
+        else
+          obj
         end
-        newval[k] = v
+      elsif obj.is_a? Array
+        obj.map {|item| fixnumify item }
+      elsif obj.is_a? Hash
+        obj.merge( obj ) {|k, val| fixnumify val }
+      else
+        obj
       end
-      newval
+    end 
+    munge do |value|
+      fixnumify value
     end
   end
 

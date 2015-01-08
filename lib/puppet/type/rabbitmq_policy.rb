@@ -40,6 +40,16 @@ Puppet::Type.newtype(:rabbitmq_policy) do
         raise ArgumentError, 'definition must be a non-empty Hash'
       end
     end
+    munge do |value|
+      newval = {}
+      value.each do |k,v|
+        if v =~ /^\d+$/
+          v = v.to_i
+        end
+        newval[k] = v
+      end
+      newval
+    end
   end
 
   autorequire(:rabbitmq_vhost) do

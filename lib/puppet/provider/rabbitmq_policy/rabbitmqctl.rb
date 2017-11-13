@@ -11,8 +11,8 @@ Puppet::Type.type(:rabbitmq_policy).provide(:rabbitmqctl) do
   defaultfor :feature => :posix
 
   def self.instances
-    rabbitmqctl('list_vhosts').split(/\n/)[1..-2].collect do |vhost|
-      rabbitmqctl('list_policies', '-p', vhost).split(/\n/)[1..-2].collect do |line|
+    rabbitmqctl('-q', 'list_vhosts').split(/\n/).collect do |vhost|
+      rabbitmqctl('-q', 'list_policies', '-p', vhost).split(/\n/).collect do |line|
         # /   federate mcollective exchanges  exchanges   ^(mcollective_|amq\\.)  {"federation-upstream-set":"all"}   0
         if line =~ /^(\S+)\s+(.+)\s+(\S+)\s+(\S+)\s(\S+)\s+(\S+)$/
           new(:name => $2, :ensure => :present, :vhost => $1, :apply_to => $3, :pattern => $4, :definition => JSON.parse($5), :priority => $6)

@@ -11,8 +11,8 @@ Puppet::Type.type(:rabbitmq_federation_upstreamset).provide(:rabbitmqctl) do
   defaultfor :feature => :posix
 
   def self.instances
-    rabbitmqctl('list_vhosts').split(/\n/)[1..-2].collect do |vhost|
-      rabbitmqctl('list_parameters', '-p', vhost).split(/\n/).select { |line| line =~ /^federation-upstream-set/ }.collect do |line|
+    rabbitmqctl('-q', 'list_vhosts').split(/\n/).collect do |vhost|
+      rabbitmqctl('-q', 'list_parameters', '-p', vhost).split(/\n/).select { |line| line =~ /^federation-upstream-set/ }.collect do |line|
         if line =~ /^\S+\s+(\S+)\s+(\S+)$/
           names = JSON.parse($2).collect { |data| data['upstream'] }
           new(:name => $1, :ensure => :present, :vhost => vhost, :upstreams => names)

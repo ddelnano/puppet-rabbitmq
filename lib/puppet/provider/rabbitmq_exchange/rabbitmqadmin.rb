@@ -23,20 +23,11 @@ Puppet::Type.type(:rabbitmq_exchange).provide(:rabbitmqadmin) do
   end
 
   def self.all_vhosts
-    parse_command(rabbitmqctl('list_vhosts'))
+    rabbitmqctl('-q', 'list_vhosts').split(/\n/)
   end
 
   def self.all_exchanges(vhost)
-    parse_command(rabbitmqctl('list_exchanges', '-p', vhost, 'name', 'type'))
-  end
-
-  def self.parse_command(cmd_output)
-    # first line is:
-    # Listing exchanges/vhosts ...
-    # while the last line is
-    # ...done.
-    #
-    cmd_output.split(/\n/)[1..-2]
+    rabbitmqctl('-q', 'list_exchanges', '-p', vhost, 'name', 'type').split(/\n/)
   end
 
   def self.instances

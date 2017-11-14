@@ -11,9 +11,9 @@ Puppet::Type.type(:rabbitmq_parameter).provide(:rabbitmqctl) do
   defaultfor :feature => :posix
 
   def self.instances
-    rabbitmqctl('list_vhosts').split(/\n/)[1..-2].collect do |vhost|
+    rabbitmqctl('-q', 'list_vhosts').split(/\n/).collect do |vhost|
       # Federation should be handled by the dedicated federation classes to avoid errors
-      rabbitmqctl('list_parameters', '-p', vhost).split(/\n/)[1..-2].select { |line| line =~ /^(?!federation)/ }.collect do |line|
+      rabbitmqctl('-q', 'list_parameters', '-p', vhost).split(/\n/).select { |line| line =~ /^(?!federation)/ }.collect do |line|
         if line =~ /^(\S+)\s+(\S+)\s+(\S+)$/
           new(:name => $2, :ensure => :present, :vhost => vhost, :component => $1, :value => JSON.parse($3))
         else

@@ -23,8 +23,8 @@ Puppet::Type.type(:rabbitmq_federation_upstream).provide(:rabbitmqctl) do
   end
 
   def self.instances
-    rabbitmqctl('list_vhosts').split(/\n/)[1..-2].collect do |vhost|
-      rabbitmqctl('list_parameters', '-p', vhost).split(/\n/).select { |line| line =~ /^federation-upstream\s+/ }.collect do |line|
+    rabbitmqctl('-q', 'list_vhosts').split(/\n/).collect do |vhost|
+      rabbitmqctl('-q', 'list_parameters', '-p', vhost).split(/\n/).select { |line| line =~ /^federation-upstream\s+/ }.collect do |line|
         if line =~ /^\S+\s+(\S+)\s+(\S+)$/
           data = JSON.parse($2)
           new(:name => $1, :ensure => :present, :vhost => vhost, :uri => data['uri'], :expires => data['expires'].to_s, :message_ttl => data['message-ttl'].to_s, :ack_mode => data['ack-mode'], :trust_user_id => bool_to_sym(data['trust-user-id']), :prefetch_count => data['prefetch-count'].to_s, :max_hops => data['max-hops'].to_s, :reconnect_delay => data['reconnect-delay'].to_s)
